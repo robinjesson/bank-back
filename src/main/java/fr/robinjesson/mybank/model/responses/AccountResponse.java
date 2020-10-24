@@ -2,26 +2,26 @@ package fr.robinjesson.mybank.model.responses;
 
 import fr.robinjesson.mybank.model.entities.Account;
 
+import java.time.LocalDate;
+
 public class AccountResponse {
     private Long id;
     private String name;
-    private Integer maxRed;
-    private Integer minGreen;
     private Double total;
+    private LocalDate update;
 
     public AccountResponse() {
     }
 
-    public AccountResponse(Long id, String name, Integer maxRed, Integer minGreen, Double total) {
+    public AccountResponse(Long id, String name, Double total, LocalDate update) {
         this.id = id;
         this.name = name;
-        this.maxRed = maxRed;
-        this.minGreen = minGreen;
         this.total = total;
+        this.update = update;
     }
 
     public AccountResponse(Account account) {
-        this(account.getId(), account.getName(), account.getMaxRed(), account.getMinGreen(), account.getTotal());
+        this(account.getId(), account.getName(), account.getTotal(), account.getLastUpdate());
     }
 
     public Long getId() {
@@ -32,15 +32,11 @@ public class AccountResponse {
         return name;
     }
 
-    public Integer getMaxRed() {
-        return maxRed;
-    }
-
-    public Integer getMinGreen() {
-        return minGreen;
-    }
-
     public Double getTotal() {
         return total;
+    }
+
+    public LocalDate getUpdate() {
+        return update;
     }
 }

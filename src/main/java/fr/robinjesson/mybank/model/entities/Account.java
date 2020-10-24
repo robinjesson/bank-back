@@ -4,48 +4,54 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
 public class Account {
     @Id
-    @NonNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String name;
 
     @JsonIgnore
     @ManyToOne
-    @NonNull
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "account")
-    private Set<Writing> writings;
+    private Set<Entry> entries;
 
-    @NonNull
-    @Column(nullable = false, columnDefinition = "int default 500")
-    private Integer maxRed = 500;
+    @OneToMany(mappedBy = "account")
+    private Set<EntryPeriod> entryPeriods;
 
-    @NonNull
-    @Column(nullable = false, columnDefinition = "int default 1000")
-    private Integer minGreen = 1000;
-
-    @NonNull
     private Double total;
+
+    @Column(columnDefinition = "date default NOW()")
+    private LocalDate lastUpdate;
+
+
+
+    public Account(Long id, String name, User user, Set<Entry> entries, Double total, LocalDate update) {
+        this.id = id;
+        this.name = name;
+        this.user = user;
+        this.entries = entries;
+        this.total = total;
+        this.lastUpdate = update;
+    }
 
     public Account(@NonNull String name, @NonNull User user, @NonNull Double total) {
         this.name = name;
         this.user = user;
         this.total = total;
+        this.lastUpdate = LocalDate.now();
     }
 
     public Account() {
     }
 
-    @NonNull
     public Long getId() {
         return id;
     }
@@ -54,7 +60,6 @@ public class Account {
         this.id = id;
     }
 
-    @NonNull
     public String getName() {
         return name;
     }
@@ -63,7 +68,6 @@ public class Account {
         this.name = name;
     }
 
-    @NonNull
     public User getUser() {
         return user;
     }
@@ -72,38 +76,35 @@ public class Account {
         this.user = user;
     }
 
-    public Set<Writing> getWritings() {
-        return writings;
+    public Set<Entry> getEntries() {
+        return entries;
     }
 
-    public void setWritings(Set<Writing> writings) {
-        this.writings = writings;
+    public void setEntries(Set<Entry> writings) {
+        this.entries = writings;
     }
 
-    @NonNull
-    public Integer getMaxRed() {
-        return maxRed;
-    }
-
-    public void setMaxRed(@NonNull Integer maxRed) {
-        this.maxRed = maxRed;
-    }
-
-    @NonNull
-    public Integer getMinGreen() {
-        return minGreen;
-    }
-
-    public void setMinGreen(@NonNull Integer minGreen) {
-        this.minGreen = minGreen;
-    }
-
-    @NonNull
     public Double getTotal() {
         return total;
     }
 
     public void setTotal(@NonNull Double total) {
         this.total = total;
+    }
+
+    public LocalDate getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(LocalDate update) {
+        this.lastUpdate = update;
+    }
+
+    public Set<EntryPeriod> getEntryPeriods() {
+        return entryPeriods;
+    }
+
+    public void setEntryPeriods(Set<EntryPeriod> entryPeriods) {
+        this.entryPeriods = entryPeriods;
     }
 }

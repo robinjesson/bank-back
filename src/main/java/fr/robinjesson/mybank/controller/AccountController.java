@@ -5,47 +5,45 @@ import fr.robinjesson.mybank.model.entities.User;
 import fr.robinjesson.mybank.model.requests.AccountAddRequest;
 import fr.robinjesson.mybank.model.requests.UpdateFieldRequest;
 import fr.robinjesson.mybank.model.responses.AccountResponse;
-import fr.robinjesson.mybank.model.responses.WritingResponse;
 import fr.robinjesson.mybank.repository.AccountDao;
 import fr.robinjesson.mybank.repository.UserDao;
-import fr.robinjesson.mybank.repository.WritingDao;
+import fr.robinjesson.mybank.repository.EntryDao;
+import fr.robinjesson.mybank.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/accounts")
 public class AccountController {
     @Autowired
-    private AccountDao accountDao;
+    private AccountService accountService;
 
     @Autowired
     private UserDao userDao;
 
     @Autowired
-    private WritingDao writingDao;
+    private EntryDao entryDao;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAccount(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(new AccountResponse(this.accountDao.findById(id).orElseThrow()));
+            return ResponseEntity.ok(new AccountResponse(this.accountService.findById(id).orElseThrow()));
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/{id}/writings")
-    public ResponseEntity<?> getAccountWritings(@PathVariable Long id) {
+    @GetMapping("/{id}/entryPeriods")
+    public ResponseEntity<?> getAccountEntryPeriods(@PathVariable Long id) {
         try {
-            this.accountDao.findById(id).orElseThrow();
-            return ResponseEntity.ok(this.writingDao.findByAccountId(id).stream()
-                    .map(w -> new WritingResponse(w))
-                    .collect(Collectors.toList()));
+
+            Account account = this.accountService.findById(id).orElseThrow();
+            return ResponseEntity.ok(this.accountService.getAllEntryPeriodByAccountId(account));
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -56,7 +54,7 @@ public class AccountController {
         try {
             User user = this.userDao.findById(req.getUserId()).orElseThrow();
             Account account = new Account(req.getName(), user, req.getTotal());
-            return ResponseEntity.ok(this.accountDao.save(account));
+            return ResponseEntity.ok(this.accountService.save(account));
         } catch(NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -66,24 +64,18 @@ public class AccountController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAccount(@PathVariable Long id, @RequestBody UpdateFieldRequest req) {
         try {
-            Account account = accountDao.findById(id).orElseThrow();
+            Account account = accountService.findById(id).orElseThrow();
             switch (req.getField()) {
                 default:
                     throw new NoSuchFieldException();
                 case "name":
                     account.setName((String) req.getValue());
                     break;
-                case "maxRed":
-                    account.setMaxRed((Integer)req.getValue());
-                    break;
-                case "maxGreen":
-                    account.setMinGreen((Integer)req.getValue());
-                    break;
                 case "total":
                     account.setTotal((Double) req.getValue());
                     break;
             }
-            return ResponseEntity.ok(new AccountResponse(accountDao.save(account)));
+            return ResponseEntity.ok(new AccountResponse(accountService.save(account)));
         } catch (NoSuchFieldException | NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

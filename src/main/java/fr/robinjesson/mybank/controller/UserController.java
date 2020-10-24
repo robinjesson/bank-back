@@ -2,7 +2,7 @@ package fr.robinjesson.mybank.controller;
 
 import fr.robinjesson.mybank.model.entities.User;
 import fr.robinjesson.mybank.model.requests.UpdateFieldRequest;
-import fr.robinjesson.mybank.model.requests.UserRequest;
+import fr.robinjesson.mybank.model.requests.LoginRequest;
 import fr.robinjesson.mybank.model.responses.AccountResponse;
 import fr.robinjesson.mybank.model.responses.UserResponse;
 import fr.robinjesson.mybank.repository.AccountDao;
@@ -64,7 +64,7 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<?> addUser(@RequestBody UserRequest req) {
+    public ResponseEntity<?> addUser(@RequestBody LoginRequest req) {
         if(this.dao.existsByUsername(req.getUsername()))
             return new ResponseEntity<>(HttpStatus.CONFLICT);
 
@@ -103,7 +103,7 @@ public class UserController {
         } catch(NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
+ 
     }
 
     private String encryptThisString(String input)

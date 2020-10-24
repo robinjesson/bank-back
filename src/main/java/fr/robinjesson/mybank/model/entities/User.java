@@ -1,28 +1,27 @@
 package fr.robinjesson.mybank.model.entities;
 
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 
 @Entity
 public class User implements UserDetails {
     @Id
-    @NonNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull
     private String username;
 
-    @NonNull
     private String password;
 
     @OneToMany(mappedBy = "user")
     private Set<Account> accounts;
+
+    private LocalDate lastConnection;
 
     public User(String username, String password) {
         this.username = username;
@@ -89,5 +88,13 @@ public class User implements UserDetails {
 
     public void setAccounts(Set<Account> accounts) {
         this.accounts = accounts;
+    }
+
+    public LocalDate getLastConnection() {
+        return lastConnection;
+    }
+
+    public void setLastConnection() {
+        this.lastConnection = LocalDate.now();
     }
 }
