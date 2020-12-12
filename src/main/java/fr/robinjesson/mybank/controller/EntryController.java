@@ -56,4 +56,10 @@ public class EntryController {
         return ResponseEntity.ok(null);
     }
 
+    @DeleteMapping
+    public void deleteEntry(@PathVariable Long id) {
+        this.entryService.delete(id);
+
+    }
+
 }

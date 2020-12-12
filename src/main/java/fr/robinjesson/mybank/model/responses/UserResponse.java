@@ -40,4 +40,8 @@ public class UserResponse {
     public String getUsername() {
         return username;
     }
+
+    public List<EntryResponse> getPeriodicEntries() {
+        return periodicEntries;
+    }
 }

@@ -13,10 +13,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
@@ -25,6 +23,9 @@ public class AccountService {
 
     @Autowired
     private EntryPeriodService entryPeriodService;
+
+    @Autowired
+    private EntryService entryService;
 
     public List<Account> findByUserId(Long id) {
         return this.accountDao.findByUserId(id);
@@ -35,7 +36,7 @@ public class AccountService {
         account.getEntryPeriods().forEach(entryPeriod -> {
             entries.addAll(this.entryPeriodService.regulEntryPeriod(entryPeriod, account));
         });
-        return entries;
+        return entries.stream().map(entry -> this.entryService.save(entry, account)).collect(Collectors.toList());
     }
 
     public void modifyLastUpdate(Account account) {
@@ -45,6 +46,15 @@ public class AccountService {
 
     public Set<EntryPeriod> getAllEntryPeriodByAccountId(Account account) {
         return account.getEntryPeriods();
+    }
+    public Set<Entry> getAllEntriesByAccount(Account account) {
+        return account.getEntries();
+    }
+    public List<Entry> getAllEntriesByAccountByYearMonth(Account account, Integer year, Integer month) {
+        return account.getEntries().stream()
+                .filter(e -> e.getDate().getYear() == year && e.getDate().getMonthValue() == month)
+                .sorted(Comparator.comparing(Entry::getDate))
+                .collect(Collectors.toList());
     }
 
     public Optional<Account> findById(Long id) {

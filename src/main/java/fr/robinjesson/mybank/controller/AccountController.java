@@ -5,6 +5,7 @@ import fr.robinjesson.mybank.model.entities.User;
 import fr.robinjesson.mybank.model.requests.AccountAddRequest;
 import fr.robinjesson.mybank.model.requests.UpdateFieldRequest;
 import fr.robinjesson.mybank.model.responses.AccountResponse;
+import fr.robinjesson.mybank.model.responses.EntryResponse;
 import fr.robinjesson.mybank.repository.AccountDao;
 import fr.robinjesson.mybank.repository.UserDao;
 import fr.robinjesson.mybank.repository.EntryDao;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -49,6 +51,29 @@ public class AccountController {
         }
     }
 
+    @GetMapping("/{id}/entries/{year}/{month}")
+    public ResponseEntity<?> getAccountEntryPeriodsDate(@PathVariable Long id,@PathVariable Integer year,@PathVariable Integer month) {
+        try {
+            Account account = this.accountService.findById(id).orElseThrow();
+            return ResponseEntity.ok(this.accountService.getAllEntriesByAccountByYearMonth(account, year, month)
+                    .stream().map(entry -> new EntryResponse(entry)).collect(Collectors.toList()));
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{id}/entries")
+    public ResponseEntity<?> getAccountEntries(@PathVariable Long id) {
+        try {
+
+            Account account = this.accountService.findById(id).orElseThrow();
+            return ResponseEntity.ok(this.accountService.getAllEntriesByAccount(account)
+                    .stream().map(entry -> new EntryResponse(entry)).collect(Collectors.toList()));
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> addAccount(@RequestBody AccountAddRequest req) {
         try {
@@ -77,6 +102,18 @@ public class AccountController {
             }
             return ResponseEntity.ok(new AccountResponse(accountService.save(account)));
         } catch (NoSuchFieldException | NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{id}/refresh")
+    public ResponseEntity<?> refreshAccount(@PathVariable Long id) {
+        try {
+            Account account = accountService.findById(id).orElseThrow();
+            System.out.println(account);
+            this.accountService.regulAccount(account);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

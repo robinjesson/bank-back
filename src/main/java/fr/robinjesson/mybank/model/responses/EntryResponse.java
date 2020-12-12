@@ -10,12 +10,14 @@ public class EntryResponse {
     private String title;
     private Double amount;
     private LocalDate date;
+    private Long entryPeriodId;
 
-    public EntryResponse(Long id, String title, Double amount, LocalDate date) {
+    public EntryResponse(Long id, String title, Double amount, LocalDate date, Long entryPeriodId) {
         this.id = id;
         this.title = title;
         this.amount = amount;
         this.date = date;
+        this.entryPeriodId = entryPeriodId;
     }
 
     public EntryResponse(Entry entry) {
@@ -23,6 +25,10 @@ public class EntryResponse {
         this.title = entry.getTitle();
         this.amount = entry.getAmount();
         this.date = entry.getDate();
+        if(entry.getEntryPeriod() != null)
+            this.entryPeriodId = entry.getEntryPeriod().getId();
+        else
+            this.entryPeriodId = null;
     }
 
     public EntryResponse() {
@@ -42,5 +48,9 @@ public class EntryResponse {
 
     public LocalDate getDate() {
         return date;
+    }
+
+    public Long getEntryPeriodId() {
+        return entryPeriodId;
     }
 }

@@ -41,7 +41,7 @@ public class EntryPeriodService {
             System.out.println(entryPeriod);
             if(entryPeriod.getBegin().compareTo(LocalDate.now()) <= 0) {
                 Entry e = new Entry(entryPeriod.getTitle(), entryPeriod.getAmount(), entryPeriod.getBegin(), entryPeriod, entryPeriod.getAccount());
-                e = this.entryService.save(e, account);
+                //e = this.entryService.save(e, account);
                 entries.add(e);
                 return e;
             }
@@ -72,7 +72,7 @@ public class EntryPeriodService {
                 if(next.compareTo(LocalDate.now()) <= 0 &&
                         next.compareTo(entryPeriod.getEnd()) <= 0) {
                     entry = new Entry(entry.getTitle(), entry.getAmount(), next, entryPeriod, entry.getAccount());
-                    entry = this.entryService.save(entry, account);
+                    //entry = this.entryService.save(entry, account);
                     entries.add(entry);
                 } else {
                     break;

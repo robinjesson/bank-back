@@ -53,6 +53,6 @@ public class AuthenticationController {
 
         List<Entry> entries = this.userService.regulAccount(user);
 
-        return ResponseEntity.ok(new AuthenticationResponse(token, new UserResponse(user, entries)));
+        return ResponseEntity.ok(new AuthenticationResponse(token, new UserResponse(user)));
     }
 }
