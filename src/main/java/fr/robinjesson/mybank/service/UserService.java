@@ -2,6 +2,7 @@ package fr.robinjesson.mybank.service;
 
 import fr.robinjesson.mybank.model.entities.Entry;
 import fr.robinjesson.mybank.model.entities.User;
+import fr.robinjesson.mybank.model.responses.AccountResponse;
 import fr.robinjesson.mybank.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,12 +33,14 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<Entry> regulAccount(User user) {
-        List<Entry> entries = new LinkedList<>();
+    public List<AccountResponse> regulAccount(User user) {
+        List<AccountResponse> accounts = new LinkedList<AccountResponse>();
         user.getAccounts().forEach(account -> {
-            entries.addAll(this.accountService.regulAccount(account));
+            List<Entry> entries = this.accountService.regulAccount(account);
+            if(entries.size() < 0)
+                accounts.add(new AccountResponse(account));
         });
-        return entries;
+        return accounts;
     }
 
 

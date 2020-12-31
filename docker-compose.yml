@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  myapp-mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=my_bank
+      - MYSQL_PASSWORD=root
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  myapp-main:
+    image: my-bank-back
+    depends_on:
+      myapp-mysql:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    environment:
+      - DATABASE_HOST=myapp-mysql
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=my_bank
+      - DATABASE_PORT=3306

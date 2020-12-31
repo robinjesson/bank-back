@@ -9,10 +9,12 @@ import java.util.Set;
 
 @Entity
 public class Account {
+    @Column(name="account_id")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="account_name")
     private String name;
 
     @JsonIgnore
@@ -23,12 +25,14 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private Set<Entry> entries;
 
+    @Column(name="account_entry_periods")
     @OneToMany(mappedBy = "account")
     private Set<EntryPeriod> entryPeriods;
 
+    @Column(name="account_total")
     private Double total;
 
-    @Column(columnDefinition = "date default NOW()")
+    @Column(name="account_last_update")
     private LocalDate lastUpdate;
 
 

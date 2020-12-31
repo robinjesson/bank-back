@@ -14,6 +14,10 @@ public class AccountAddRequest {
         this.total = total;
     }
 
+    public AccountAddRequest(String name, Long userId) {
+        this(name, userId, 0.0);
+    }
+
     public String getName() {
         return name;
     }

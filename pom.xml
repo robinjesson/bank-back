@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>my-bank</name>
 	<description>Back for account management</description>
+	<packaging>jar</packaging>
 
 	<properties>
 		<java.version>12</java.version>
