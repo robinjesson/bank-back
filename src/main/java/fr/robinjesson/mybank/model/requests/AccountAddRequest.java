@@ -29,13 +29,4 @@ public class AccountAddRequest {
     public Double getTotal() {
         return total;
     }
-
-    @Override
-    public String toString() {
-        return "AccountAddRequest{" +
-                "name='" + name + '\'' +
-                ", userId=" + userId +
-                ", total=" + total +
-                '}';
-    }
 }
