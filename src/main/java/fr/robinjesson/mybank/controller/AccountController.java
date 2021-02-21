@@ -78,11 +78,24 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<?> addAccount(@RequestBody AccountAddRequest req) {
         try {
+            System.out.println(req);
             User user = this.userDao.findById(req.getUserId()).orElseThrow();
             Account account = new Account(req.getName(), user, req.getTotal());
             return ResponseEntity.ok(this.accountService.save(account));
         } catch(NoSuchElementException e) {
             return new ResponseEntity<>("No user found with id " + req.getUserId() + ".", HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        try {
+            Account account = this.accountService.findById(id).orElseThrow();
+            this.accountService.delete(account.getId());
+            return (ResponseEntity<?>) ResponseEntity.ok();
+        } catch(NoSuchElementException e) {
+            return new ResponseEntity<>("No account found with id " + id + ".", HttpStatus.NOT_FOUND);
         }
 
     }

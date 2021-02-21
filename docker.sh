@@ -1,0 +1,1 @@
+mvn package -Dmaven.test.skip=true && docker build -t my-bank-back . && docker-compose up
