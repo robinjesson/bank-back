@@ -1,7 +1,5 @@
 package fr.robinjesson.mybank.controller;
 
-import fr.robinjesson.mybank.controller.exception.FieldNotFound;
-import fr.robinjesson.mybank.model.entities.Entry;
 import fr.robinjesson.mybank.model.entities.User;
 import fr.robinjesson.mybank.model.requests.UpdateFieldRequest;
 import fr.robinjesson.mybank.model.requests.LoginRequest;
@@ -9,14 +7,12 @@ import fr.robinjesson.mybank.model.responses.AccountResponse;
 import fr.robinjesson.mybank.model.responses.UserResponse;
 import fr.robinjesson.mybank.repository.AccountDao;
 import fr.robinjesson.mybank.repository.UserDao;
-import fr.robinjesson.mybank.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -38,9 +34,6 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserService userService;
-
 
     @GetMapping
     public ResponseEntity<?> getAll(){
@@ -53,7 +46,7 @@ public class UserController {
         try {
             user = dao.findById(id).orElseThrow();
         } catch(NoSuchElementException e) {
-            return new ResponseEntity<>("No user found with id " + id + ".", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(new UserResponse(user));
     }
@@ -96,10 +89,8 @@ public class UserController {
                     user.setPassword(bcrypt);
                     break;
             }
-        } catch(NoSuchElementException e) {
-            return new ResponseEntity<>("No user found with id " + id + ".", HttpStatus.NOT_FOUND);
-        } catch(NoSuchFieldException e) {
-            return new FieldNotFound(req.getField(), "USER");
+        } catch(NoSuchFieldException | NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(new UserResponse(dao.save(user)));
     }
@@ -110,7 +101,7 @@ public class UserController {
             dao.delete(dao.findById(id).orElseThrow());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch(NoSuchElementException e) {
-            return new ResponseEntity<>("No user found with id " + id + ".", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
  
     }
@@ -144,19 +135,6 @@ public class UserController {
         // For specifying wrong message digest algorithms
         catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    public ResponseEntity<?> regalUserAccounts(@PathVariable Long id) {
-        User user;
-        try {
-            user = dao.findById(id).orElseThrow();
-
-            List<AccountResponse> accountsRegul = this.userService.regulAccount(user);
-
-            return new ResponseEntity<>(accountsRegul, HttpStatus.OK);
-        } catch(NoSuchElementException e) {
-            return new ResponseEntity<>("No user found with id " + id + ".", HttpStatus.NOT_FOUND);
         }
     }
 }

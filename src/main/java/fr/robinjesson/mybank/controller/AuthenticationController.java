@@ -8,7 +8,6 @@ import fr.robinjesson.mybank.model.responses.UserResponse;
 import fr.robinjesson.mybank.service.UserService;
 import fr.robinjesson.mybank.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -44,13 +43,15 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
             );
         } catch(BadCredentialsException e) {
-            return new ResponseEntity<>("Bad credantials.", HttpStatus.UNAUTHORIZED);
+            throw e;
         }
 
         final User user = this.userDetailsService.loadUserByUsername(req.getUsername());
         final String token = jwtUtil.generateToken(user);
         user.setLastConnection();
         this.userService.save(user);
+
+        List<Entry> entries = this.userService.regulAccount(user);
 
         return ResponseEntity.ok(new AuthenticationResponse(token, new UserResponse(user)));
     }

@@ -1,6 +1,5 @@
 package fr.robinjesson.mybank.controller;
 
-import fr.robinjesson.mybank.controller.exception.FieldNotFound;
 import fr.robinjesson.mybank.model.entities.Account;
 import fr.robinjesson.mybank.model.entities.User;
 import fr.robinjesson.mybank.model.requests.AccountAddRequest;
@@ -59,7 +58,7 @@ public class AccountController {
             return ResponseEntity.ok(this.accountService.getAllEntriesByAccountByYearMonth(account, year, month)
                     .stream().map(entry -> new EntryResponse(entry)).collect(Collectors.toList()));
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("No account found with id " + id + ".", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -71,7 +70,7 @@ public class AccountController {
             return ResponseEntity.ok(this.accountService.getAllEntriesByAccount(account)
                     .stream().map(entry -> new EntryResponse(entry)).collect(Collectors.toList()));
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("No account found with id " + id + ".", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -82,7 +81,7 @@ public class AccountController {
             Account account = new Account(req.getName(), user, req.getTotal());
             return ResponseEntity.ok(this.accountService.save(account));
         } catch(NoSuchElementException e) {
-            return new ResponseEntity<>("No user found with id " + req.getUserId() + ".", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
     }
@@ -102,10 +101,8 @@ public class AccountController {
                     break;
             }
             return ResponseEntity.ok(new AccountResponse(accountService.save(account)));
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("No account found with id " + id + ".", HttpStatus.NOT_FOUND);
-        } catch (NoSuchFieldException e) {
-            return new FieldNotFound(req.getField(), "ACCOUNT");
+        } catch (NoSuchFieldException | NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -113,10 +110,11 @@ public class AccountController {
     public ResponseEntity<?> refreshAccount(@PathVariable Long id) {
         try {
             Account account = accountService.findById(id).orElseThrow();
+            System.out.println(account);
             this.accountService.regulAccount(account);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("No account found with id " + id + ".", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
